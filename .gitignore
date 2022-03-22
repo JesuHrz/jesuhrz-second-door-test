@@ -1,0 +1,42 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+seconddoor-server/node_modules
+seconddoor-frontend/node_modules
+seconddoor-frontend/.pnp
+seconddoor-frontend/.pnp.js
+
+# next.js
+seconddoor-frontend/.next/
+seconddoor-frontend/out/
+
+# production
+seconddoor-frontend//build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+seconddoor-server/.env
+seconddoor-server/.env.local
+seconddoor-server/.env.development.local
+seconddoor-server/.env.test.local
+seconddoor-server/.env.production.local
+seconddoor-frontend/.env
+seconddoor-frontend/.env.local
+seconddoor-frontend/.env.development.local
+seconddoor-frontend/.env.test.local
+seconddoor-frontend/.env.production.local
+
+# vercel
+seconddoor-frontend/.vercel
+
+# typescript
+seconddoor-frontend/*.tsbuildinfo

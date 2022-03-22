@@ -1,0 +1,47 @@
+{
+  "name": "seconddoor-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest . --verbose --detectOpenHandles",
+    "test:watch": "npm run test -- --watch",
+    "test:coverage": "npm run test -- --coverage"
+  },
+  "keywords": [],
+  "author": "Jesus Hernandez <jesusbeckan@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server-core": "^3.6.4",
+    "apollo-server-express": "^3.6.4",
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "defaults": "^1.0.3",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "express-jwt": "^6.1.1",
+    "graphql": "^16.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.6.0",
+    "pg-hstore": "^2.3.3",
+    "pino": "^6.11.3",
+    "sequelize": "^6.6.2",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "jest": "^27.5.1",
+    "nodemon": "^2.0.15",
+    "pino-pretty": "^4.7.1",
+    "sequelize-cli": "6.4.1",
+    "standard": "^16.0.4",
+    "supertest": "^6.2.2"
+  },
+  "eslintConfig": {
+    "extends": "./node_modules/standard/eslintrc.json",
+    "env": {
+      "jest": true
+    }
+  }
+}
