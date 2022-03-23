@@ -25,6 +25,22 @@ export function setupUser (UserModel) {
     })
   }
 
+  function findById (id) {
+    return UserModel.findByPk(id)
+  }
+
+  function update ({ id, ...query }) {
+    const cond = {
+      where: {
+        id
+      },
+      individualHooks: true,
+      raw: true
+    }
+
+    return UserModel.update(query, cond)
+  }
+
   function deleteBy (query) {
     return UserModel.destroy({
       where: query,
@@ -35,6 +51,8 @@ export function setupUser (UserModel) {
   return {
     create,
     findBy,
+    findById,
+    update,
     deleteBy
   }
 }

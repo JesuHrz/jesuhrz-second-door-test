@@ -21,7 +21,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ApolloProvider client={client}>
       <GlobalStyle />
-      <Component apolloClient={client} {...pageProps}  />
+      <Component {...pageProps}  />
       <div id='modal-root'></div>
     </ApolloProvider>
   )

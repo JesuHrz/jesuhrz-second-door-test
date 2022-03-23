@@ -6,7 +6,7 @@ import config from '../config/index.js'
 import {
   successAuthQuery,
   successfulCreatedTask,
-  successfulUpdatedTaskByStatus,
+  successfulUpdatedTask,
   getTaskById,
   getTasksByUserId,
   removeTaskById
@@ -85,6 +85,27 @@ describe('Task', () => {
     expect(errors[0].message).toBe('Unauthorized')
   })
 
+  it('Create task with invalid token', async () => {
+    const query = Object.assign({}, successfulCreatedTask)
+    query.variables = {
+      input: { ...task }
+    }
+
+    const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAwMDAwMDAwMCwibmFtZSI6Ikpob24iLCJsYXN0TmFtZSI6Ikhlcm5hbmRleiIsImVtYWlsIjoiamVzdXNAdGVzdC5jb20iLCJwYXNzd29yZCI6IiQyYiQwNSRBNHY3eUVXeHczYmNpbVlFVHZSUlIuOThEUWRJOERxdHNVcGZvVjVOa1ZLOTJhMHdRMEY2VyIsImNyZWF0ZWRBdCI6IjIwMjItMDMtMjFUMTU6MzA6MDMuMjI3WiIsImlhdCI6MTY0ODA2MjI3NX0.EyJM7WGBcNHCTVJiPXwyFR_UfIiZUosGfHKB3ZGm_BY'
+
+    const response = await request(url)
+      .post('/')
+      .set({ Authorization: `Bearer ${jwt}` })
+      .expect('Content-Type', /application\/json/)
+      .expect(200)
+      .send(query)
+
+    const { errors } = response.body
+
+    expect(errors).toBeDefined()
+    expect(errors[0].message).toBe('User is not found.')
+  })
+
   it('Successful created task', async () => {
     const query = Object.assign({}, successfulCreatedTask)
     query.variables = {
@@ -131,9 +152,13 @@ describe('Task', () => {
   })
 
   it('Updates task with invalid id', async () => {
-    const query = Object.assign({}, successfulUpdatedTaskByStatus)
-    query.variables.id = 123123
-    query.variables.input.status = 'IN_PROGRESS'
+    const query = Object.assign({}, successfulUpdatedTask)
+    query.variables = {
+      id: 123123,
+      input: {
+        status: 'IN_PROGRESS'
+      }
+    }
 
     const response = await request(url)
       .post('/')
@@ -148,10 +173,16 @@ describe('Task', () => {
     expect(errors[0].message).toBe('Task is not found.')
   })
 
-  it('Updates task by status: IN_PROGRESS', async () => {
-    const query = Object.assign({}, successfulUpdatedTaskByStatus)
-    query.variables.id = draftTask.id
-    query.variables.input.status = 'IN_PROGRESS'
+  it('Updates task', async () => {
+    const query = Object.assign({}, successfulUpdatedTask)
+    query.variables = {
+      id: draftTask.id,
+      input: {
+        status: 'IN_PROGRESS',
+        title: 'This is a new title',
+        description: 'This is a new description'
+      }
+    }
 
     const response = await request(url)
       .post('/')
@@ -165,12 +196,18 @@ describe('Task', () => {
     expect(data.updateTask).toBeDefined()
     expect(data.updateTask.id).toEqual(draftTask.id.toString())
     expect(data.updateTask.status).toEqual(query.variables.input.status)
+    expect(data.updateTask.title).toEqual(query.variables.input.title)
+    expect(data.updateTask.description).toEqual(query.variables.input.description)
   })
 
-  it('Updates task by status: NOT_STARTED', async () => {
-    const query = Object.assign({}, successfulUpdatedTaskByStatus)
-    query.variables.id = draftTask.id
-    query.variables.input.status = 'NOT_STARTED'
+  it('Updates task with invalid status', async () => {
+    const query = Object.assign({}, successfulUpdatedTask)
+    query.variables = {
+      id: draftTask.id,
+      input: {
+        status: 'INVALID_STATUS'
+      }
+    }
 
     const response = await request(url)
       .post('/')
@@ -179,35 +216,17 @@ describe('Task', () => {
       .expect(200)
       .send(query)
 
-    const { data, errors } = response.body
-    expect(errors).toBeUndefined()
-    expect(data.updateTask).toBeDefined()
-    expect(data.updateTask.id).toEqual(draftTask.id.toString())
-    expect(data.updateTask.status).toEqual(query.variables.input.status)
+    const { errors } = response.body
+    expect(errors).toBeDefined()
+    expect(errors[0].message).toMatch(/enum_Tasks_status/)
   })
 
-  it('Updates task by status: COMPLETED', async () => {
-    const query = Object.assign({}, successfulUpdatedTaskByStatus)
-    query.variables.id = draftTask.id
-    query.variables.input.status = 'COMPLETED'
-
-    const response = await request(url)
-      .post('/')
-      .set({ Authorization: `Bearer ${draftUser.jwt}` })
-      .expect('Content-Type', /application\/json/)
-      .expect(200)
-      .send(query)
-
-    const { data, errors } = response.body
-    expect(errors).toBeUndefined()
-    expect(data.updateTask).toBeDefined()
-    expect(data.updateTask.id).toEqual(draftTask.id.toString())
-    expect(data.updateTask.status).toEqual(query.variables.input.status)
-  })
-
-  it('Updates task title without authorization', async () => {
-    const query = Object.assign({}, successfulUpdatedTaskByStatus)
-    query.variables.id = draftTask.id
+  it('Updates task without authorization', async () => {
+    const query = Object.assign({}, successfulUpdatedTask)
+    query.variables = {
+      id: draftTask.id,
+      input: { ...task }
+    }
     query.variables.input.title = 'This is a new title'
 
     const response = await request(url)
@@ -222,42 +241,26 @@ describe('Task', () => {
     expect(errors[0].message).toBe('Unauthorized')
   })
 
-  it('Updates task title', async () => {
-    const query = Object.assign({}, successfulUpdatedTaskByStatus)
-    query.variables.id = draftTask.id
-    query.variables.input.title = 'This is a new title'
+  it('Update task with invalid token', async () => {
+    const query = Object.assign({}, successfulUpdatedTask)
+    query.variables = {
+      id: draftTask.id,
+      input: { ...task }
+    }
+
+    const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAwMDAwMDAwMCwibmFtZSI6Ikpob24iLCJsYXN0TmFtZSI6Ikhlcm5hbmRleiIsImVtYWlsIjoiamVzdXNAdGVzdC5jb20iLCJwYXNzd29yZCI6IiQyYiQwNSRBNHY3eUVXeHczYmNpbVlFVHZSUlIuOThEUWRJOERxdHNVcGZvVjVOa1ZLOTJhMHdRMEY2VyIsImNyZWF0ZWRBdCI6IjIwMjItMDMtMjFUMTU6MzA6MDMuMjI3WiIsImlhdCI6MTY0ODA2MjI3NX0.EyJM7WGBcNHCTVJiPXwyFR_UfIiZUosGfHKB3ZGm_BY'
 
     const response = await request(url)
       .post('/')
-      .set({ Authorization: `Bearer ${draftUser.jwt}` })
+      .set({ Authorization: `Bearer ${jwt}` })
       .expect('Content-Type', /application\/json/)
       .expect(200)
       .send(query)
 
-    const { data, errors } = response.body
-    expect(errors).toBeUndefined()
-    expect(data.updateTask).toBeDefined()
-    expect(data.updateTask.id).toEqual(draftTask.id.toString())
-    expect(data.updateTask.title).toEqual(query.variables.input.title)
-  })
+    const { errors } = response.body
 
-  it('Updates task description', async () => {
-    const query = Object.assign({}, successfulUpdatedTaskByStatus)
-    query.variables.id = draftTask.id
-    query.variables.input.description = 'This is a new description'
-
-    const response = await request(url)
-      .post('/')
-      .set({ Authorization: `Bearer ${draftUser.jwt}` })
-      .expect('Content-Type', /application\/json/)
-      .expect(200)
-      .send(query)
-
-    const { data, errors } = response.body
-    expect(errors).toBeUndefined()
-    expect(data.updateTask).toBeDefined()
-    expect(data.updateTask.id).toEqual(draftTask.id.toString())
-    expect(data.updateTask.description).toEqual(query.variables.input.description)
+    expect(errors).toBeDefined()
+    expect(errors[0].message).toBe('User is not found.')
   })
 
   it('Retrieves task by user id and task id without authorization', async () => {
@@ -348,9 +351,11 @@ describe('Task', () => {
     expect(errors[0].message).toBe('Task not found')
   })
 
-  it('Removes task by Id without authorization', async () => {
+  it('Removes task by id without authorization', async () => {
     const query = Object.assign({}, removeTaskById)
-    query.variables.id = draftTask.id
+    query.variables = {
+      id: draftTask.id
+    }
 
     const response = await request(url)
       .post('/')
@@ -366,7 +371,9 @@ describe('Task', () => {
 
   it('Removes task by Id', async () => {
     const query = Object.assign({}, removeTaskById)
-    query.variables.id = draftTask.id
+    query.variables = {
+      id: draftTask.id
+    }
 
     const response = await request(url)
       .post('/')
@@ -383,7 +390,9 @@ describe('Task', () => {
 
   it('Removes task with invalid id', async () => {
     const query = Object.assign({}, removeTaskById)
-    query.variables.id = 99999
+    query.variables = {
+      id: 999999
+    }
 
     const response = await request(url)
       .post('/')
@@ -396,5 +405,26 @@ describe('Task', () => {
     expect(errors).toBeDefined()
     expect(errors.length).toEqual(1)
     expect(errors[0].message).toBe('Task is not found.')
+  })
+
+  it('Removes task with invalid token', async () => {
+    const query = Object.assign({}, removeTaskById)
+    query.variables = {
+      id: draftTask.id
+    }
+
+    const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAwMDAwMDAwMCwibmFtZSI6Ikpob24iLCJsYXN0TmFtZSI6Ikhlcm5hbmRleiIsImVtYWlsIjoiamVzdXNAdGVzdC5jb20iLCJwYXNzd29yZCI6IiQyYiQwNSRBNHY3eUVXeHczYmNpbVlFVHZSUlIuOThEUWRJOERxdHNVcGZvVjVOa1ZLOTJhMHdRMEY2VyIsImNyZWF0ZWRBdCI6IjIwMjItMDMtMjFUMTU6MzA6MDMuMjI3WiIsImlhdCI6MTY0ODA2MjI3NX0.EyJM7WGBcNHCTVJiPXwyFR_UfIiZUosGfHKB3ZGm_BY'
+
+    const response = await request(url)
+      .post('/')
+      .set({ Authorization: `Bearer ${jwt}` })
+      .expect('Content-Type', /application\/json/)
+      .expect(200)
+      .send(query)
+
+    const { errors } = response.body
+    expect(errors).toBeDefined()
+    expect(errors.length).toEqual(1)
+    expect(errors[0].message).toBe('User is not found.')
   })
 })

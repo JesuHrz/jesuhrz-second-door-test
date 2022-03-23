@@ -13,6 +13,12 @@ export const typeDefs = gql`
     status: String
   }
 
+  input UserInput {
+    name: String
+    lastName: String
+    password: String
+  }
+
   input TaskCreatingInput {
     title: String!
     description: String!
@@ -67,6 +73,10 @@ export const typeDefs = gql`
       email: String!
       password: String!
     ): Auth!
+
+    updateUser(
+      input: UserInput!
+    ): User!
 
     createTask(
       input: TaskCreatingInput!

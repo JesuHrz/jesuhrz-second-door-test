@@ -60,6 +60,17 @@ export const successfulCreatedUser = {
   }`
 }
 
+export const successfulUpdatedUser = {
+  query: `mutation updateUser($input: UserInput!) {
+    updateUser(input: $input) {
+      id
+      name
+      lastName
+      email
+    }
+  }`
+}
+
 export const InvalidCreatedUser = {
   query: `mutation createUser($namme: String!, $lasttName: String!, $emmail: String!, $paspsword: String!) {
     createUser(name: $name, lastName: $lastName, email: $email, password: $password) {
@@ -88,7 +99,7 @@ export const successfulCreatedTask = {
   }`
 }
 
-export const successfulUpdatedTaskByStatus = {
+export const successfulUpdatedTask = {
   query: `mutation updateTaskByStatus ($id: ID!, $input: TaskInput!) {
     updateTask (id: $id, input: $input) {
       id
@@ -97,10 +108,7 @@ export const successfulUpdatedTaskByStatus = {
       status
       createdAt
     }
-  }`,
-  variables: {
-    input: {}
-  }
+  }`
 }
 
 export const getTaskById = {
@@ -154,6 +162,5 @@ export const removeTaskById = {
       status
       createdAt
     }
-  }`,
-  variables: {}
+  }`
 }

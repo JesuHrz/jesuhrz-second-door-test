@@ -17,53 +17,50 @@ import { logger } from './utils/index.js'
 const PORT = 3001
 
 export default async function startApolloServer () {
-  try {
-    const app = express()
-    const httpServer = http.createServer(app)
-    const database = await db(config.db)
+  const app = express()
+  const httpServer = http.createServer(app)
+  const database = await db(config.db)
 
-    app.use(cors({
-      origin: '*'
-    }))
+  app.use(cors({
+    origin: '*'
+  }))
 
-    app.use(
-      expressJwt({
-        secret: config.auth.secret,
-        algorithms: config.auth.algorithms,
-        credentialsRequired: false
-      })
-    )
-
-    const server = new ApolloServer({
-      typeDefs,
-      resolvers,
-      context: async ({ req }) => {
-        const user = req.user || null
-        return {
-          db: database,
-          user
-        }
-      },
-      plugins: [
-        ApolloServerPluginDrainHttpServer({ httpServer }),
-        ApolloServerPluginLandingPageGraphQLPlayground()
-      ]
+  app.use(
+    expressJwt({
+      secret: config.auth.secret,
+      algorithms: config.auth.algorithms,
+      credentialsRequired: false
     })
-    await server.start()
-    server.applyMiddleware({ app })
+  )
 
-    const url = `http://localhost:${PORT}${server.graphqlPath}`
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: async ({ req, ...rest }) => {
+      const user = req.user || null
+      return {
+        db: database,
+        user
+      }
+    },
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      ApolloServerPluginLandingPageGraphQLPlayground()
+    ]
+  })
 
-    httpServer.listen({ port: PORT }, () => {
-      logger.info(`🚀 Server ready at ${url} 🚀 `)
-    })
+  await server.start()
+  server.applyMiddleware({ app })
 
-    return {
-      server: httpServer,
-      url
-    }
-  } catch (err) {
-    logger.error(`Error starting server: ${err.message}`)
+  const url = `http://localhost:${PORT}${server.graphqlPath}`
+
+  httpServer.listen({ port: PORT }, (...aa) => {
+    logger.info(`🚀 Server ready at ${url} 🚀 `)
+  })
+
+  return {
+    server: httpServer,
+    url
   }
 }
 
@@ -71,7 +68,6 @@ process.on('uncaughtException', handleFatalError)
 process.on('unhandledRejection', handleFatalError)
 
 function handleFatalError (err) {
-  console.error(`[fatal error] ${err.message}`)
-  console.error(err.stack)
+  logger.error('Error starting error:', err.message)
   process.exit(1)
 }

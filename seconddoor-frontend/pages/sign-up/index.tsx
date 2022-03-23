@@ -102,7 +102,7 @@ const SignUp: NextPage = () => {
             <Button type='submit' value='Create Account' disabled={loading} />
           </Wrapper>
           <Wrapper className="text-end">
-            <Link to='/'>Sign up</Link>
+            <Link to='/sign-in'>Sign in</Link>
           </Wrapper>
         </form>
       </Content>

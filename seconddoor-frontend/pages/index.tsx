@@ -4,13 +4,14 @@ import axios from 'axios'
 import Board from 'react-trello'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery, useApolloClient } from '@apollo/client'
 import { useFormik } from 'formik'
 
 import withSession from 'lib/session'
 import {
   GET_TASKS,
-  READ_TASK
+  READ_TASK,
+  READ_TASK_1
  } from 'utils/graphql/queries'
 import {
   CREATE_TASK,
@@ -49,9 +50,10 @@ const INITIAL_STATE = {
   ]
 }
 
-const Home: NextPage = ({ jwt, apolloClient }) => {
+const Home: NextPage = ({ jwt }) => {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const apolloClient = useApolloClient()
   const [queryIsReady, setQueryIsReady] = useState(false)
   const [handleEventBus, setHandleEventBus] = useState({})
   const result = useQuery(GET_TASKS, {
@@ -66,6 +68,8 @@ const Home: NextPage = ({ jwt, apolloClient }) => {
   const [handleRemoveTask] = useMutation(DELETE_TASK, {
     context: { headers: { authorization: `Bearer ${jwt}` } }
   })
+
+  console.log('apolloClient', apolloClient.cache)
 
   useEffect(() => {
     if (result.data && !queryIsReady && handleEventBus.publish)  {
@@ -187,6 +191,14 @@ const Home: NextPage = ({ jwt, apolloClient }) => {
       id: `Task:${cardId}`,
       fragment: READ_TASK,
     })
+
+
+    const result = apolloClient.readQuery({
+      query: READ_TASK_1
+    })
+
+    console.log('result', result)
+
     formik.setFieldValue('id', task.id)
     formik.setFieldValue('title', task.title)
     formik.setFieldValue('description', task.description)

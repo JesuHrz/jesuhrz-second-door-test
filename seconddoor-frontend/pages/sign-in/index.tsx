@@ -94,6 +94,7 @@ export default SignIn
 
 export const getServerSideProps = withSession(({ req, res }) => {
   const token = req.session.get('token')
+  console.log('token')
 
   if (token) {
     res.setHeader('location', '/')

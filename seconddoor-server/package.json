@@ -6,9 +6,12 @@
   "type": "module",
   "scripts": {
     "start": "nodemon index.js",
-    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest . --verbose --detectOpenHandles",
+    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest . --detectOpenHandles",
     "test:watch": "npm run test -- --watch",
-    "test:coverage": "npm run test -- --coverage"
+    "test:coverage": "npm run test -- --coverage",
+    "test:task": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest tests/task.test.js --watch --detectOpenHandles",
+    "test:server": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest tests/server.test.js --watch --detectOpenHandles",
+    "test:user": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest tests/user.test.js --watch --detectOpenHandles"
   },
   "keywords": [],
   "author": "Jesus Hernandez <jesusbeckan@gmail.com>",
@@ -23,6 +26,7 @@
     "express": "^4.17.3",
     "express-jwt": "^6.1.1",
     "graphql": "^16.3.0",
+    "graphql-resolvers": "^0.4.2",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.6.0",
     "pg-hstore": "^2.3.3",
@@ -43,5 +47,8 @@
     "env": {
       "jest": true
     }
+  },
+  "jest": {
+    "verbose": true
   }
 }

@@ -1,14 +1,10 @@
 export function setupTask (TaskModel, UserModel) {
   async function create ({ userId, title, description }) {
-    const { id } = await UserModel.findByPk(userId)
-
-    if (id) {
-      return TaskModel.create({
-        userId: id,
-        title,
-        description
-      })
-    }
+    return TaskModel.create({
+      userId,
+      title,
+      description
+    })
   }
 
   function deleteBy (query) {

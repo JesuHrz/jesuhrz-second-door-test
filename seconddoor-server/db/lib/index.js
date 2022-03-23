@@ -11,8 +11,4 @@ export function hashPassword (pass) {
   return bcrypt.hash(pass, saltRounds)
 }
 
-export function comparePassword (pass, hash) {
-  return bcrypt.compare(pass, hash)
-}
-
 export default setupDatabase

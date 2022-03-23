@@ -37,3 +37,15 @@ export const READ_TASK = gql`
     createdAt
   }
 `
+
+export const READ_TASK_1 = gql`
+  query ReadTask {
+    task(id: 101) {
+      id
+      title
+      description
+      status
+      createdAt
+    }
+  }
+`
