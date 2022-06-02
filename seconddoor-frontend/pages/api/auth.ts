@@ -1,16 +1,13 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next'
-import withSession from 'lib/session'
+import { withSessionRoute } from 'lib/session'
 
 type Data = {
   data: string
 }
 
-export default withSession(async (req: NextApiRequest<Any>, res: NextApiResponse<Data>) => {
+export default withSessionRoute(async (req: any, res: any) => {
   try {
     const body = await req.body
-    console.log('body', body)
-    req.session.set('token', body.jwt)
+    req.session.token = body.jwt
     await req.session.save()
     res.json({ data: 'Authenticated' })
   } catch (error: any) {

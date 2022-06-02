@@ -92,20 +92,41 @@ const SignIn: NextPage = () => {
 
 export default SignIn
 
-export const getServerSideProps = withSession(({ req, res }) => {
-  const token = req.session.get('token')
-  console.log('token')
+export const getServerSideProps = withSession(
+  async function getServerSideProps({ req, res }: { req: any, res: any }) {
+    const user = req.session;
 
-  if (token) {
-    res.setHeader('location', '/')
-    res.statusCode = 302
-    res.end()
-    return { 
-      props: {}
-    }
-  }
+    console.log('user', user)
 
-  return {
-    props: {}
-  }
-})
+    // if (user) {
+    //   res.setHeader('location', '/')
+    //   res.statusCode = 302
+    //   res.end()
+    //   return { 
+    //     props: {}
+    //   }
+    // }
+
+    return {
+      props: {},
+    };
+  },
+);
+
+// export const getServerSideProps = withSession(({ req, res }) => {
+//   const token = req.session.get('token')
+//   console.log('token')
+
+//   if (token) {
+//     res.setHeader('location', '/')
+//     res.statusCode = 302
+//     res.end()
+//     return { 
+//       props: {}
+//     }
+//   }
+
+//   return {
+//     props: {}
+//   }
+// })

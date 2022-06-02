@@ -1,7 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import withSession from 'lib/session'
+import { withSessionRoute } from 'lib/session'
 
-export default withSession(async (req: NextApiRequest<Any>, res: NextApiResponse<Data>) => {
+type Data = {
+  data: string
+}
+
+export default withSessionRoute(async (req: any, res: any) => {
   req.session.destroy()
   res.json(201)
 })

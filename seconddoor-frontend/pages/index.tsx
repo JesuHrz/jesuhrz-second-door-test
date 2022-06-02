@@ -69,8 +69,6 @@ const Home: NextPage = ({ jwt }) => {
     context: { headers: { authorization: `Bearer ${jwt}` } }
   })
 
-  console.log('apolloClient', apolloClient.cache)
-
   useEffect(() => {
     if (result.data && !queryIsReady && handleEventBus.publish)  {
       result.data.getTasksByUserId.notStarted.forEach(task => {
@@ -301,7 +299,7 @@ const Home: NextPage = ({ jwt }) => {
 export default Home
 
 export const getServerSideProps = withSession(({ req, res }) => {
-  const token = req.session.get('token')
+  const token = req.session.token;
 
   if (!token) {
     res.setHeader('location', '/sign-in')

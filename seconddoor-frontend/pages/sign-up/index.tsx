@@ -113,7 +113,7 @@ const SignUp: NextPage = () => {
 export default SignUp
 
 export const getServerSideProps = withSession(({ req, res }) => {
-  const token = req.session.get('token')
+  const token = req.session.token
 
   if (token) {
     res.setHeader('location', '/')
